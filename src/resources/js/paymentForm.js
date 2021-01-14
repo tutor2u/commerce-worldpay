@@ -1,4 +1,5 @@
 function initWorldpay() {
+    // Testing if forked version works?
     // Because this might get executed before Worldpay is loaded.
     if (typeof Worldpay === "undefined") {
         setTimeout(initWorldpay, 200);
