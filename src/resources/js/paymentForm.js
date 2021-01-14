@@ -1,17 +1,23 @@
+function findClosestParent (startElement, fn) {
+    var parent = startElement.parentElement;
+    if (!parent) return undefined;
+    return fn(parent) ? parent : findClosestParent(parent, fn);
+}
+
 function initWorldpay() {
-    // Testing if forked version works?
     // Because this might get executed before Worldpay is loaded.
     if (typeof Worldpay === "undefined") {
         setTimeout(initWorldpay, 200);
     } else {
-        var $wrapper = $('.worldpay-form');
-        var key = $wrapper.data('clientkey');
-        var $form = $wrapper.parents('form');
+        var $wrapper = document.querySelector('.worldpay-form');;
+        var $form = findClosestParent($wrapper, function(element) {
+            return element.tagName === 'FORM';
+        });
+        var key = $wrapper.dataset.clientkey;
 
-        $form.on('submit', function (ev) {
-            if ($(ev.currentTarget).find('input[name=worldpayToken]').length === 0)
-            {
-                ev.preventDefault();
+        $form.addEventListener("submit", function(e){
+            if (e.currentTarget.querySelectorAll('input[name=worldpayToken]').length === 0) {
+                e.preventDefault();
                 Worldpay.submitTemplateForm();
                 return false;
             }
@@ -30,15 +36,15 @@ function initWorldpay() {
                     _el.value = obj.token;
                     _el.type = 'hidden';
                     _el.name = 'worldpayToken';
-                    document.getElementById($form.attr('id')).appendChild(_el);
-                    document.getElementById($form.attr('id')).submit();
+                    document.getElementById($form.id).appendChild(_el);
+                    document.getElementById($form.id).submit();
                 }
             }
         });
 
-        if ($('.modal').data('modal')) {
-            $('.modal').data('modal').updateSizeAndPosition();
-        }
+        // if ($('.modal').data('modal')) {
+        //     $('.modal').data('modal').updateSizeAndPosition();
+        // }
     }
 }
 
